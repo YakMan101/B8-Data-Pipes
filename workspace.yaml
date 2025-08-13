@@ -1,0 +1,4 @@
+# Development configuration for Dagster
+
+load_from:
+  - python_module: b8_data_pipes.definitions
