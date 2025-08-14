@@ -2,7 +2,7 @@
 
 import io
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 from dagster import asset, AssetExecutionContext
@@ -34,8 +34,19 @@ def booking_report_asset(
 ) -> pd.DataFrame:
     """Generate a DataFrame of bookings within the specified date range"""
     
-    start_timestamp = parse_date_string(config.start_date)
-    end_timestamp = parse_date_string(config.end_date)
+    if not config.end_date.strip():
+        end_timestamp = datetime.now()
+    else:
+        end_timestamp = parse_date_string(config.end_date)
+    
+    if not config.start_date.strip():
+        start_timestamp = end_timestamp - timedelta(days=7)
+    else:
+        start_timestamp = parse_date_string(config.start_date)
+    
+    if end_timestamp < start_timestamp:
+        raise ValueError(f"End date ({end_timestamp.strftime('%Y-%m-%d')}) "
+                         f"cannot be before start date ({start_timestamp.strftime('%Y-%m-%d')})")
 
     context.log.info(
         f"Generating booking CSV report from {start_timestamp.strftime('%Y-%m-%d %H:%M:%S')} "
@@ -50,7 +61,7 @@ def booking_report_asset(
     if not bookings:
         context.log.warning("No bookings found for the specified period")
         discord.send_message(
-            f"📊 **Booking Report**\n"
+            f"📊 **Bookings Report**\n"
             f"Period: {start_timestamp.strftime('%Y-%m-%d')} to {end_timestamp.strftime('%Y-%m-%d')}\n"
             f"❌ No bookings found for this period."
         )

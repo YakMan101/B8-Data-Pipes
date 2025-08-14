@@ -15,11 +15,23 @@ load_dotenv()
 class DiscordResource(ConfigurableResource):
     """Resource for sending messages to Discord via webhook"""
 
-    webhook_url: str = getenv("DISCORD_WEBHOOK_URL", "")
+    
+
+    def get_webhook_url(self) -> str:
+        """Retrieve the Discord webhook URL from environment variables."""
+
+        webhook_url = getenv("DISCORD_WEBHOOK_URL", "")
+        if not webhook_url:
+            raise ValueError("DISCORD_WEBHOOK_URL not found in environment variables")
+        
+        return webhook_url
 
     def send_message(self, content: str, embeds: list = []) -> bool:
-        """Send a message to Discord channel."""
-        if not self.webhook_url:
+        """Send a message to Discord channel"""
+        
+        webhook_url = self.get_webhook_url()
+
+        if not webhook_url:
             raise ValueError("DISCORD_WEBHOOK_URL not found in environment variables")
 
         payload = {
@@ -27,7 +39,8 @@ class DiscordResource(ConfigurableResource):
             "embeds": embeds,
         }
 
-        response = requests.post(self.webhook_url, json=payload)
+        response = requests.post(webhook_url, json=payload)
+
         return response.status_code == 204
 
     def send_csv_report(
@@ -40,11 +53,13 @@ class DiscordResource(ConfigurableResource):
     ) -> bool:
         """Send a CSV file with booking data to Discord"""
 
-        if not self.webhook_url:
+        webhook_url = self.get_webhook_url()
+
+        if not webhook_url:
             raise ValueError("DISCORD_WEBHOOK_URL not found in environment variables")
 
         message_content = (
-            f"📊 **Weekly Booking Report**\n"
+            f"📊 **Weekly Bookings Report**\n"
             f"📅 Period: {period_start} to {period_end}\n"
             f"📈 Total Bookings: {total_bookings}\n"
             f"📎 CSV file attached below"
@@ -54,7 +69,8 @@ class DiscordResource(ConfigurableResource):
 
         data = {"content": message_content}
 
-        response = requests.post(self.webhook_url, data=data, files=files)
+        response = requests.post(webhook_url, data=data, files=files)
+
         return response.status_code == 200
 
 

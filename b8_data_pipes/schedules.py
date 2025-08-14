@@ -4,15 +4,15 @@ from datetime import timedelta
 
 from dagster import schedule
 
-from b8_data_pipes.definitions import weekly_booking_report_job
+from b8_data_pipes.jobs import weekly_bookings_report_job
 
 
 @schedule(
-    job=weekly_booking_report_job,
+    job=weekly_bookings_report_job,
     cron_schedule="0 1 * * 1",
     execution_timezone="UTC",
 )
-def weekly_booking_report_schedule(context):
+def weekly_bookings_report_schedule(context):
     """Schedule to run the weekly booking report"""
     
     scheduled_date = context.scheduled_execution_time
