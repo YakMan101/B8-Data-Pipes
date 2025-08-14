@@ -13,7 +13,7 @@ load_dotenv()
 
 
 class DiscordResource(ConfigurableResource):
-    """Resource for sending messages to Discord via webhook."""
+    """Resource for sending messages to Discord via webhook"""
 
     webhook_url: str = getenv("DISCORD_WEBHOOK_URL", "")
 
@@ -38,11 +38,11 @@ class DiscordResource(ConfigurableResource):
         period_end: str,
         total_bookings: int,
     ) -> bool:
-        """Send a CSV file with booking data to Discord."""
+        """Send a CSV file with booking data to Discord"""
+
         if not self.webhook_url:
             raise ValueError("DISCORD_WEBHOOK_URL not found in environment variables")
 
-        # Create the message content
         message_content = (
             f"📊 **Weekly Booking Report**\n"
             f"📅 Period: {period_start} to {period_end}\n"
@@ -50,7 +50,6 @@ class DiscordResource(ConfigurableResource):
             f"📎 CSV file attached below"
         )
 
-        # Prepare the file for upload
         files = {"file": (filename, csv_content, "text/csv")}
 
         data = {"content": message_content}
@@ -60,12 +59,12 @@ class DiscordResource(ConfigurableResource):
 
 
 class FirebaseResource(ConfigurableResource):
-    """Resource for connecting to Firebase Firestore."""
+    """Resource for connecting to Firebase Firestore"""
 
     def setup_for_execution(self, context) -> None:
-        """Initialize Firebase connection."""
+        """Initialize Firebase connection"""
+
         if not firebase_admin._apps:
-            # Create credentials from environment variables
             cred_dict = {
                 "type": "service_account",
                 "project_id": getenv("FIREBASE_PROJECT_ID"),
@@ -79,7 +78,6 @@ class FirebaseResource(ConfigurableResource):
                 "client_x509_cert_url": getenv("FIREBASE_CLIENT_CERT_URL"),
             }
 
-            # For development with emulator
             if getenv("USE_EMULATORS") == "true":
                 environ["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
                 cred = credentials.ApplicationDefault()
@@ -93,10 +91,10 @@ class FirebaseResource(ConfigurableResource):
     def get_bookings(
         self, start_date: str = "", end_date: str = ""
     ) -> List[Dict[str, Any]]:
-        """Fetch bookings from Firestore."""
+        """Fetch bookings from Firestore"""
+
         bookings_ref = self._db.collection("bookings")
 
-        # Add date filtering if provided
         query = bookings_ref
         if start_date:
             query = query.where("sessionDate", ">=", start_date)
@@ -112,7 +110,3 @@ class FirebaseResource(ConfigurableResource):
             bookings.append(booking_data)
 
         return bookings
-
-
-firebase_resource = FirebaseResource()
-discord_resource = DiscordResource()
