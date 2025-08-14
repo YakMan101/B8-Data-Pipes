@@ -1,43 +1,55 @@
 # B8 Data Pipes
 
-A Dagster-based data pipeline for B8 data schediles.
+A Dagster-based data pipeline for generating weekly booking reports from Firebase and sending them to Discord.
+
+## Prerequisites
+
+- Python 3.12+
+- Firebase project with service account credentials
+- Discord webhook URL
 
 ## Setup
 
-1. **Install dependencies**:
+1. **Create and activate virtual environment**:
+
+   **Linux/macOS**:
+   ```bash
+   python3.12 -m venv venv
+   source venv/bin/activate
+   ```
+
+   **Windows**:
+   ```cmd
+   python3.12 -m venv venv
+   venv\Scripts\activate
+   ```
+
+2. **Install uv package manager**:
+   ```bash
+   pip install uv
+   ```
+
+3. **Install dependencies**:
    ```bash
    uv sync
    ```
 
-2. **Configure environment variables** in `.env`:
-   - Firebase service account credentials
-   - Discord webhook URL
+4. **Configure environment**:
+   - Copy `.env.example` to `.env`
+   - Fill in your Firebase service account credentials
+   - Add your Discord webhook URL
 
-3. **Run the setup script**:
-   ```bash
-   ./setup.sh
-   ```
-
-4. **Start Dagster**:
+5. **Start Dagster development server**:
    ```bash
    uv run dagster dev
    ```
 
-5. **Access the UI** at http://localhost:3000
+6. **Access the UI** at http://localhost:3000
 
 ## Environment Variables
 
-### Firebase (Service Account)
-```
-FIREBASE_PROJECT_ID=your_project_id
-FIREBASE_PRIVATE_KEY_ID=your_private_key_id
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
-FIREBASE_CLIENT_EMAIL=your_service_account@project.iam.gserviceaccount.com
-FIREBASE_CLIENT_ID=your_client_id
-FIREBASE_CLIENT_CERT_URL=https://...
-```
+Create a `.env` file based on `.env.example` with your actual credentials:
 
-### Discord
-```
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
-```
+- **Firebase**: Service account credentials from your Firebase project
+- **Discord**: Webhook URL for sending reports
+- **USE_EMULATORS**: Set to `true` for local Firebase emulator development
